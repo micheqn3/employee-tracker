@@ -24,6 +24,7 @@ This repository contains
   - Inquirer
   - MySQL
   - Chalk
+  - Console.table
 
 ### Screenshot of rendered file
 

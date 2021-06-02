@@ -1,14 +1,16 @@
 const inquirer = require('inquirer');
 const chalk = require('chalk');
 
-const validateInput = (input) => { // Validation for if the user doesn't enter a value
+// Validation for if the user doesn't enter a value
+const validateInput = (input) => { 
     if(!input) {
         return chalk.red("Please enter a value.");
     }
     return true;
 }
 
-const menuQ = [
+// Menu choices
+const menuQ = [ 
     { 
         name: 'choice',
         message: 'What would you like to do?',
@@ -22,13 +24,12 @@ const menuQ = [
             "View All Departments", 
             "Update Employee Role",
             "Update Employee Manager",
-            "View All Employees By Manager", 
             "Remove Employee",
             "Exit"
         ]   
     }
 ]
-
+// Prompts for adding new department
 const departmentQ = [
     {
         name: 'id', 
@@ -44,7 +45,49 @@ const departmentQ = [
     }
 ]
 
+// Prompts for adding new role
+const roleQ = [
+    {
+        name: 'id', 
+        message: 'What do you want the ID of the role to be?',
+        type: 'input',
+        validate: validateInput
+    },
+    {
+        name: 'title',
+        message: 'What title is the role?',
+        type: 'input',
+        validate: validateInput
+    },
+    {
+        name: 'salary',
+        message: 'What is the salary for the role?',
+        type: 'input',
+        validate: validateInput
+    },
+    {
+        name: 'dep',
+        message: 'What department does the role belong to?',
+        type: 'input',
+        validate: validateInput
+    }
+]
+
+// Prompts for updating employee role
+const employeeRole = [
+    {
+        name: 'name', 
+        message: 'Which employee did you want to update?',
+        type: 'input',
+        validate: validateInput
+    },
+    {
+        name: 'role', 
+        message: 'What is the name of the role you want to update for the employee?',
+        type: 'input',
+        validate: validateInput
+    }, 
+]
 
 
-
-module.exports = {menuQ, departmentQ}
+module.exports = {menuQ, departmentQ, roleQ, employeeRole}
