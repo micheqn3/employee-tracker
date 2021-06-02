@@ -23,7 +23,6 @@ const menuQ = [
             "View All Roles", 
             "View All Departments", 
             "Update Employee Role",
-            "Update Employee Manager",
             "Remove Employee",
             "Exit"
         ]   
@@ -67,7 +66,7 @@ const roleQ = [
     },
     {
         name: 'dep',
-        message: 'What department does the role belong to?',
+        message: 'What department does the role belong to? Search from the table values.',
         type: 'input',
         validate: validateInput
     }
@@ -80,14 +79,17 @@ const employeeRole = [
         message: 'Which employee did you want to update?',
         type: 'input',
         validate: validateInput
-    },
+    }
+]
+
+const employeeRole2 = [
     {
-        name: 'role', 
-        message: 'What is the name of the role you want to update for the employee?',
-        type: 'input',
-        validate: validateInput
-    }, 
+    name: 'role', 
+    message: 'What is the name of the role you want to update for the employee? Search from the table values.',
+    type: 'input',
+    validate: validateInput
+    }
 ]
 
 
-module.exports = {menuQ, departmentQ, roleQ, employeeRole}
+module.exports = {menuQ, departmentQ, roleQ, employeeRole, employeeRole2}
