@@ -1,10 +1,10 @@
 const mysql = require('mysql');
 const inquirer = require('inquirer');
-const {menuQ, departmentQ, roleQ, employeeRole, employeeRole2} = require('./src/inquirer');
 const cTable = require('console.table');
 const chalk = require('chalk');
 const dotenv = require('dotenv');
 dotenv.config();
+const {menuQ, departmentQ, roleQ, employeeRole, employeeRole2, employeeQ, removeEPrompts} = require('./src/inquirer');
 
 // Providing credentials to the SQL database
 const connection = mysql.createConnection({
@@ -19,35 +19,44 @@ class Application {
     start() { // Show the menu prompt
         inquirer.prompt(menuQ).then(answers => {
             this.pick(answers.choice);
+        }).catch(error => {
+            if (error.isTtyError) {
+                console.log("Prompt couldn't be rendered in this current environment.");
+            } else {
+                console.log("Something else went wrong");
+            }
         })
     }
-    pick(choice) { // Will redirect the menu based on user input
-        if (choice === "Add Department") {
-            this.addDp();
-            
-        } else if (choice === "Add Role") {
-            this.addRole();
-
-        } else if (choice === "Add Employee") {
-
-        } else if (choice === "View All Employees") {
-            this.viewAllE();
-
-        } else if (choice === "View All Roles") {
-            this.viewAllRD(choice);
-
-        } else if (choice === "View All Departments") {
-            this.viewAllRD(choice);
-
-        } else if (choice === "Update Employee Role") {
-            this.updateR();
-
-        } else if (choice === "Remove Employee") {
-
-        } else {
-            console.log(chalk.black.bgCyan("\nExited! See you later!\n"));
-            connection.end();
-        }
+    pick (choice) { // Will redirect the menu based on user input
+        switch (choice) {
+            case 'Add Department':
+                this.addDp();
+                break;
+            case 'Add Role':
+                this.addRole();
+                break;
+            case 'Add Employee':
+                this.addE();
+                break;
+            case 'View All Employees':
+                this.viewAllE();
+                break;
+            case 'View All Roles':
+                this.viewAllRD(choice);
+                break;
+            case 'View All Departments':
+                this.viewAllRD(choice);
+                break;
+            case 'Update Employee Role':
+                this.updateR();
+                break;
+            case 'Remove Employee':
+                this.remove();
+                break;
+            default: 
+                console.log(chalk.black.bgCyan("\nExited! See you later!\n"));
+                connection.end();
+            }
     }
     addDp() { // Adds new department into database
         inquirer.prompt(departmentQ).then(answers => {
@@ -62,14 +71,14 @@ class Application {
             })
         }) 
     }
-    addRole() { // Adds role to database
-        const qRole = "SELECT name from department";
+    addRole() { // Adds new role to database
+        const q = "SELECT name from department";
         let a = []; // Array that will hold all department names
-        connection.query(qRole, (error, results) => {
+        connection.query(q, (error, results) => {
             if (error) {
                 throw error;
             } else {
-                console.log(chalk.black.bgCyan("\nHere are all of the current departments.\n"));
+                console.log(chalk.black.bgCyan("\nHere are all of the current departments.\n")); // Displays all departments
                 console.table(results);
                 for (let i = 0 ; i < results.length ; i++) {
                     a.push(results[i].name);
@@ -77,17 +86,18 @@ class Application {
                 inquirer.prompt(roleQ).then(answers => { // If the array has the department the user input, the script will continue the query
                     if(a.includes(this.capEachWord(answers.dep))) {
                         let q1 = "SELECT id from department WHERE name = ?"
-                        connection.query(q1, answers.dep, (error, results) => { // Query that grabs the department number of the dep the user inputted
+                        connection.query(q1, answers.dep, (error, results) => { // Query that grabs the ID number of the department the user inputted
                             if (error) {
                                 throw error;
                             } else {
                                 let depID = results[0].id;
-                                let q2 = "INSERT INTO role SET ?"; // Adding this row to the role table with user input
+                                let q2 = "INSERT INTO role SET ?"; // Adding new row to the role table with user input
                                 connection.query(q2, [{id: answers.id, title: this.capEachWord(answers.title), salary: answers.salary, department_id: depID}], (error, results) => {
                                     if (error) {
                                         throw error;
                                     } else {
                                         console.log(chalk.black.bgCyan(`\nAdded ${this.capEachWord(answers.title)} to roles!\n`));
+                                        this.start();
                                     }
                                 })
                             }
@@ -98,6 +108,53 @@ class Application {
                     }
                 })
             }
+        })
+    }
+    addE() {
+        let e = []; // Will hold employee names
+        let r = []; // Will hold roles
+        inquirer.prompt(employeeQ).then(answers => { // Prompts the user data about new employee
+            const q = "SELECT employee.first_name, employee.last_name, role.title, role.id as r_id, employee.id as e_id FROM employee INNER JOIN role ON role.id = employee.role_id;"; 
+            connection.query(q, (error, results) => {
+                if (error) {
+                    throw error;
+                } else {
+                    for (let i = 0 ; i < results.length ; i++) { // Loop through results and save employee names/roles in arrays
+                        e.push(results[i].first_name.concat(` ${results[i].last_name}`));
+                        r.push(results[i].title);
+                    } 
+
+                    // Validation before query to check if db includes the inputted manager name and role
+                    if (answers.manager && e.includes(this.capEachWord(answers.manager)) && (r.includes(this.capEachWord(answers.role)))) {
+                        const q = 'INSERT INTO employee SET ?'; // Query will add new employee to the database from user input (with manager)
+                        connection.query(q, {first_name: this.capEachWord(answers.name), last_name: this.capEachWord(answers.name2), role_id: this.findID(this.capEachWord(answers.role), results), manager_id: 99}, (error, results) => {
+                            if (error) {
+                                throw error;
+                            } else {
+                                console.log(chalk.black.bgCyan(`\nAdded ${this.capEachWord(answers.name)} to the database!\n`));
+                                this.start();
+                            }
+                        })
+
+                    // Validation before query to check if db includes the inputted role
+                    } else if (!answers.manager && (r.includes(this.capEachWord(answers.role)))) {
+                        const q = 'INSERT INTO employee SET ?'; // Query will add new employee to the database from user input (without manager)
+                        connection.query(q, {first_name: this.capEachWord(answers.name), last_name: this.capEachWord(answers.name2), role_id: this.findID(this.capEachWord(answers.role), results)}, (error, results) => {
+                            if (error) {
+                                throw error;
+                            } else {
+                                console.log(chalk.black.bgCyan(`\nAdded ${this.capEachWord(answers.name)} to the database!\n`));
+                                this.start();
+                            }
+                        })
+
+                    // If the values are not found in the database
+                    } else {
+                        console.log(chalk.red("\nWe couldn't find those values in the database.\n"));
+                        this.start();
+                    }
+                }
+            })
         })
     }
     viewAllE() { // Query to view all employees
@@ -128,19 +185,18 @@ class Application {
         })
     }
     updateR() { // Updates employee role 
-        const qRole = "SELECT first_name, last_name from employee";
-        let a = []; // Array will hold the names of the employees
-        let r = [] // Array will hold the current roles in the database
+        const q = "SELECT first_name, last_name from employee";
+        let a = []; // Holds employee names
+        let r = []; // Holds roles
         let name; // Holds the employee name
-        connection.query(qRole, (error, results) => {
+        connection.query(q, (error, results) => {
             if (error) {
                 throw error;
             } else {
                 console.log(chalk.black.bgCyan("\nHere are all of the current employees.\n"));
-                for (let i = 0 ; i < results.length ; i++) { // Concat and displays all first and last names of employees in db
-                    let data = results[i].first_name.concat(` ${results[i].last_name}`);
-                    console.log(data);
-                    a.push(data);
+                for (let i = 0 ; i < results.length ; i++) { // Concat and displays all first and last names of employees from db
+                    console.log(results[i].first_name.concat(` ${results[i].last_name}`));
+                    a.push(results[i].first_name.concat(` ${results[i].last_name}`));
                 }
                 inquirer.prompt(employeeRole).then(answers => { // Asks the user for employee name
                     if (a.includes(this.capEachWord(answers.name))) { // If the name the user input exists in the array, the script will continue to update role
@@ -151,8 +207,8 @@ class Application {
                             if (error) {
                                 throw error;
                             } else {
-                                console.table(results);
-                                for (let i = 0 ; i < results.length ; i++) { // Concat and displays all first and last names of employees in db
+                                console.table(results); // Displays all roles from db
+                                for (let i = 0 ; i < results.length ; i++) { 
                                     let data2 = results[i].title;
                                     r.push(data2);
                                 }
@@ -176,8 +232,9 @@ class Application {
                                                 })
                                             }
                                         })
-                                    } else {
-                                        console.log(chalk.red("\nRole not found in the database. I'll take you back to the menu.\n")); // If the role is not found
+                                    } else { // If the role is not found
+                                        console.log(chalk.red("\nRole not found in the database. I'll take you back to the menu.\n")); 
+                                        this.start();
                                     } 
                                 })
                             }
@@ -190,7 +247,19 @@ class Application {
             }
         })
     }
-    capEachWord(str) { // Capitalizes every first word in a string for the database for consistency
+    remove() { // Removes employee from db
+    
+    }
+    findID(role, results) { // Finds the role ID associated with the role
+        for (let i = 0 ; i < results.length ; i++) {
+            if (results[i].title === this.capEachWord(role)) {
+                return results[i].r_id;
+            } 
+        }
+    }
+    /**** Need a function that will find employee ID and set it as manager ID if new employee has a manager ****/
+    
+    capEachWord(str) { // Capitalizes every first word in a string for consistency and comparing values
       return str.split(" ").map(word => {
         return word.substring(0,1).toUpperCase() + word.substring(1)
       }).join(" ")

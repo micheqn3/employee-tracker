@@ -28,6 +28,7 @@ const menuQ = [
         ]   
     }
 ]
+
 // Prompts for adding new department
 const departmentQ = [
     {
@@ -72,6 +73,43 @@ const roleQ = [
     }
 ]
 
+// Prompts for adding new employee
+const employeeQ = [
+    {
+        name: 'name', 
+        message: 'What is the first name of the employee?',
+        type: 'input',
+        validate: validateInput
+    },
+    {
+        name: 'name2',
+        message: 'What is the last name of the employee?',
+        type: 'input',
+        validate: validateInput
+    },
+    {
+        name: 'role',
+        message: "What is the employee's role? Choose a valid role from the database.",
+        type: 'input',
+        validate: validateInput
+    },
+    { 
+        name: 'choice',
+        message: 'Does the employee have a manager',
+        type: 'list',
+        choices: [ 
+            "Yes",
+            "No",
+        ]   
+    },
+    {
+        name: 'manager',
+        message: "Who is the employee's manager? Choose a valid employee from the database.",
+        type: 'input',
+        when: (answers) => answers.choice === 'Yes'
+    }
+]
+
 // Prompts for updating employee role
 const employeeRole = [
     {
@@ -85,11 +123,22 @@ const employeeRole = [
 const employeeRole2 = [
     {
     name: 'role', 
-    message: 'What is the name of the role you want to update for the employee? Search from the table values.',
+    message: 'What is the name of the role you want to update for the employee? Choose from the table values.',
+    type: 'input',
+    validate: validateInput
+    }
+]
+
+// Prompts for removing employees
+const removeEPrompts = [
+    {
+    name: 'name', 
+    message: 'What is the name of the employee you want to remove?',
     type: 'input',
     validate: validateInput
     }
 ]
 
 
-module.exports = {menuQ, departmentQ, roleQ, employeeRole, employeeRole2}
+module.exports = {menuQ, departmentQ, roleQ, employeeRole, employeeRole2, removeEPrompts, 
+employeeQ}
