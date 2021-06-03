@@ -67,7 +67,7 @@ const roleQ = [
     },
     {
         name: 'dep',
-        message: 'What department does the role belong to? Search from the table values.',
+        message: 'What department does the role belong to? Choose a valid role from the database.',
         type: 'input',
         validate: validateInput
     }
@@ -123,7 +123,7 @@ const employeeRole = [
 const employeeRole2 = [
     {
     name: 'role', 
-    message: 'What is the name of the role you want to update for the employee? Choose from the table values.',
+    message: 'What is the name of the role you want to update for the employee? Choose a valid role from the database.',
     type: 'input',
     validate: validateInput
     }
@@ -133,7 +133,7 @@ const employeeRole2 = [
 const removeEPrompts = [
     {
     name: 'name', 
-    message: 'What is the name of the employee you want to remove?',
+    message: 'What is the full name of the employee you want to remove?',
     type: 'input',
     validate: validateInput
     }
