@@ -17,12 +17,18 @@ interact with data stored in the database. This application is run through the c
 > SSH: `git@github.com:micheqn3/employee-tracker.git`
 3. Install the NPM packages
 > npm install
-4. Provide your MySQL credentials in the index.js file and make sure your server is running
-5. Run the application in command line 
+4. Create the database in MySQL using the schema found in sql/ schema.sql
+5. Provide your MySQL credentials in the index.js file and make sure your server is running
+6. Run the application in command line 
 > node index.js
 
 
 ### This repository contains: 
+  - index.js - This file connects to the MySQL database and contains an Application class,
+  which will control the flow of the application.
+  - sql/ schema.sql - This file contains the tables that will store the data.
+  - sql/ seeds.sql - This file contains the data that will prepopulate the database.
+  - src/ inquirer.js - This file contains all the prompts for the user and is utilized in index.js.
 
 ### Technologies/Languages used: 
 
@@ -32,8 +38,6 @@ interact with data stored in the database. This application is run through the c
   - MySQL
   - Chalk
   - Console.table
-
-### Screenshot of rendered file
 
 ### Walkthrough Demo
 
