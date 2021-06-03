@@ -1,7 +1,13 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 ## Employee Tracker
 
-This repository contains
+This repository contains a content management system interface that utilizes MySQL in order to view and 
+interact with data stored in the database. This application is run through the command line and allows the user to:
+
+  - Add departments, roles, and employees
+  - View departments, roles, and employees
+  - Update employee roles
+  - Remove employees
 
 ### Installation 
 
@@ -11,7 +17,8 @@ This repository contains
 > SSH: `git@github.com:micheqn3/employee-tracker.git`
 3. Install the NPM packages
 > npm install
-4. Run the application in command line 
+4. Provide your MySQL credentials in the index.js file and make sure your server is running
+5. Run the application in command line 
 > node index.js
 
 
