@@ -2,16 +2,15 @@ const mysql = require('mysql');
 const inquirer = require('inquirer');
 const cTable = require('console.table');
 const chalk = require('chalk');
-const dotenv = require('dotenv');
-dotenv.config();
-const {menuQ, departmentQ, roleQ, employeeRole, employeeRole2, employeeQ, removeEPrompts} = require('./src/inquirer');
+require('dotenv').config()
+const {menuQ, departmentQ, roleQ, employeeRole, employeeRole2, employeeQ, removeEPrompts, removeDPrompts} = require('./src/inquirer');
 
 // Providing credentials to the SQL database
 const connection = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: process.env.PASSWORD,
-    database: 'employee_trackerDB'
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASS,
+    database: process.env.DB_DATABASE
 })
 
 // This class will control the flow of the application
@@ -51,7 +50,10 @@ class Application {
                 this.updateR();
                 break;
             case 'Remove Employee':
-                this.remove();
+                this.removeE();
+                break;
+            case 'Remove Department':
+                this.removeD();
                 break;
             default: 
                 console.log(chalk.black.bgCyan("\nExited! See you later!\n"));
@@ -123,8 +125,6 @@ class Application {
                         e.push(results[i].first_name.concat(` ${results[i].last_name}`));
                         r.push(results[i].title);
                     } 
-                    console.log(r)
-
                     // Validation before query to check if db includes the inputted manager name and role
                     if (answers.manager && e.includes(this.capEachWord(answers.manager)) && (r.includes(this.capEachWord(answers.role)))) {
                         const q = 'INSERT INTO employee SET ?'; // Query will add new employee to the database from user input (with manager)
@@ -248,7 +248,7 @@ class Application {
             }
         })
     }
-    remove() { // Removes employee from db
+    removeE() { // Removes employee from db
         let a = []; // Holds employee names
         inquirer.prompt(removeEPrompts).then(answers => {
             console.log(answers.name);
@@ -279,6 +279,36 @@ class Application {
             })
         })
     }
+    removeD() { // Removes department from database
+        let a = []; // Holds departments
+        const q = "SELECT name from department"
+        connection.query(q, (error, results) => { 
+            if (error) {
+                throw error; 
+            } else {
+                for (let i = 0 ; i < results.length ; i++) { // Saves all departments into array 
+                    a.push(results[i].name);
+                }
+                const q = "SELECT name from department";
+                inquirer.prompt(removeDPrompts).then(answers => {    // Checks if department user input is in db
+                if (a.includes(this.capEachWord(answers.name))) {
+                    const q1 = "DELETE FROM department WHERE name = ?";
+                    connection.query(q1, [this.capEachWord(answers.name)], (error, results) => { // Query will remove the department from the db
+                        if (error) {
+                            throw error;
+                        } else {
+                            console.log(chalk.black.bgCyan(`\nRemoved ${this.capEachWord(answers.name)} from the database!\n`));
+                            this.start();
+                        }
+                    })
+                } else {
+                    console.log(chalk.red("\nName is not valid. I'll take you back to the menu.\n")); // If the department is not found
+                    this.start();
+                }
+                })
+            }
+        })
+    }
     findID(role, results) { // Finds the role ID associated with the role title
         for (let i = 0 ; i < results.length ; i++) {
             if (results[i].title === this.capEachWord(role)) {
@@ -286,7 +316,7 @@ class Application {
             } 
         }
     }
-    findManagerID(name, results) { // Finds the ID for manager
+    findManagerID(name, results) { // Finds the employee's manager's ID if not null 
         for (let i = 0 ; i < results.length ; i++) {
             if (results[i].first_name + " " + results[i].last_name === this.capEachWord(name)) {
                 return results[i].e_id;

@@ -38,6 +38,7 @@ interact with data stored in the database. This application is run through the c
   - MySQL
   - Chalk
   - Console.table
+  - Dotenv
 
 ### Walkthrough Demo
 

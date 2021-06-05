@@ -24,6 +24,7 @@ const menuQ = [
             "View All Departments", 
             "Update Employee Role",
             "Remove Employee",
+            "Remove Department",
             "Exit"
         ]   
     }
@@ -123,7 +124,7 @@ const employeeRole = [
 const employeeRole2 = [
     {
     name: 'role', 
-    message: 'What is the name of the role you want to update for the employee? Choose a valid role from the database.',
+    message: 'What is the name of the role you want to update for the employee? Choose a valid role from the database?',
     type: 'input',
     validate: validateInput
     }
@@ -133,7 +134,17 @@ const employeeRole2 = [
 const removeEPrompts = [
     {
     name: 'name', 
-    message: 'What is the full name of the employee you want to remove?',
+    message: 'What is the name of the employee you want to remove?',
+    type: 'input',
+    validate: validateInput
+    }
+]
+
+// Prompts for removing department
+const removeDPrompts = [
+    {
+    name: 'name', 
+    message: 'What is the name of the department you want to remove?',
     type: 'input',
     validate: validateInput
     }
@@ -141,4 +152,4 @@ const removeEPrompts = [
 
 
 module.exports = {menuQ, departmentQ, roleQ, employeeRole, employeeRole2, removeEPrompts, 
-employeeQ}
+employeeQ, removeDPrompts}
