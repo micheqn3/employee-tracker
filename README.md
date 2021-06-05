@@ -42,6 +42,8 @@ interact with data stored in the database. This application is run through the c
 
 ### Walkthrough Demo
 
+https://user-images.githubusercontent.com/68047684/120873479-1e882e80-c557-11eb-8be6-0441022b151d.mp4
+
 ### License [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 MIT 
