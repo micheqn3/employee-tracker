@@ -316,15 +316,15 @@ class Application {
             } 
         }
     }
-    findManagerID(name, results) { // Finds the employee's manager's ID if not null 
+    findManagerID(name, results) { // Finds the manager's id for employee if not null 
         for (let i = 0 ; i < results.length ; i++) {
             if (results[i].first_name + " " + results[i].last_name === this.capEachWord(name)) {
                 return results[i].e_id;
             } 
         }
     }
-    capEachWord(str) { // Capitalizes every first word in a string for consistency and comparing values
-      return str.split(" ").map(word => {
+    capEachWord(str) { // Capitalizes every first letter in each word in a string + removes whitespace for consistency and comparing values
+      return str.trim().split(" ").map(word => {
         return word.substring(0,1).toUpperCase() + word.substring(1)
       }).join(" ")
     }
