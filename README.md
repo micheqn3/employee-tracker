@@ -7,7 +7,7 @@ interact with data stored in the database. This application is run through the c
   - Add departments, roles, and employees
   - View departments, roles, and employees
   - Update employee roles
-  - Remove employees
+  - Remove employees and departments
 
 ### Installation 
 
